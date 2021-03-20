@@ -139,7 +139,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!212 &157488668
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -199,8 +199,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 157488667}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1.53, y: 2.18, z: 0}
-  m_LocalScale: {x: 2.681631, y: 1.5892161, z: 1}
+  m_LocalPosition: {x: 2.945, y: 4.49, z: 0}
+  m_LocalScale: {x: 1.1858101, y: 1.7375321, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 4
@@ -427,7 +427,7 @@ Camera:
     height: 1
   near clip plane: 0.3
   far clip plane: 1000
-  field of view: 62
+  field of view: 57.7
   orthographic: 0
   orthographic size: 5
   m_Depth: -1
@@ -491,6 +491,12 @@ MonoBehaviour:
   width: 7
   height: 10
   tilePrefab: {fileID: 2900822376530422924, guid: 6b6f6b19599cf3f4780ecd5874e1ee88, type: 3}
+  dots:
+  - {fileID: 9028331940243956548, guid: 9cf5e7e7f4fe73b4cb7add6fefa3907b, type: 3}
+  - {fileID: 8720707079769795966, guid: c5b5aaf1e57609c4799a69f099326a06, type: 3}
+  - {fileID: 1034834944316313065, guid: 5a267b416cb614945af4c2bb2629bd68, type: 3}
+  - {fileID: 2456612108376755650, guid: b7447562f6b628040897951a195e11da, type: 3}
+  - {fileID: 7347533957579651753, guid: b5a6f0f7a23ebee4b8ec4ac93b23ca34, type: 3}
 --- !u!4 &1691839459
 Transform:
   m_ObjectHideFlags: 0

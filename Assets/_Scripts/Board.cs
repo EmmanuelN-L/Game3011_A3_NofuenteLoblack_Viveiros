@@ -10,6 +10,9 @@ public enum GameState
 
 public class Board : MonoBehaviour
 {
+    public int maxCandy = 0;
+    public int score = 0;
+    public int scoreToReach;
     public GameState currentState = GameState.move;
     public int width;
     public int height;
@@ -19,19 +22,24 @@ public class Board : MonoBehaviour
     private BackgroundTile [,] allTiles;
     public GameObject[,] allDots;
     private FindMatches findMatches;
+    private UIScript UI;
+
+    
 
     // Start is called before the first frame update
     void Start()
     {
         findMatches = FindObjectOfType<FindMatches>();
+        UI = FindObjectOfType<UIScript>();
         //Creating the width and height of board
         allTiles = new BackgroundTile[width, height];
         allDots = new GameObject[width, height];
-        Setup();
+        //Setup();
+        
     }
 
 
-    private void Setup()
+    public void Setup()
     {
         for (int i =0; i < width; i++)
         {
@@ -41,12 +49,12 @@ public class Board : MonoBehaviour
                 GameObject backgrounTile = Instantiate(tilePrefab, tempPosition, Quaternion.identity) as GameObject;
                 backgrounTile.transform.parent = this.transform;
                 backgrounTile.name = "( " + i +", " + j + " )";
-                int dotToUse = Random.Range(0, dots.Length);
+                int dotToUse = Random.Range(0, maxCandy);
                 int maxIterations = 0;
 
                 while(matchesAt(i, j, dots[dotToUse]) && maxIterations < 100)
                 {
-                    dotToUse = Random.Range(0, dots.Length);
+                    dotToUse = Random.Range(0, maxCandy);
                     maxIterations++;
                 }
                 maxIterations = 0;
@@ -103,6 +111,11 @@ public class Board : MonoBehaviour
         if(allDots[column, row].GetComponent<Candy>().isMatched)
         {
             findMatches.currentMatches.Remove(allDots[column, row]);
+            score += 100;
+            if (score >= scoreToReach)
+            {
+                UI.winCondition();
+            }
             Destroy(allDots[column, row]);
             allDots[column, row] = null;
         }
@@ -156,7 +169,7 @@ public class Board : MonoBehaviour
                 if (allDots[i, j] == null)
                 {
                     Vector2 tempPosition = new Vector2(i, j + offset);
-                    int dotToUse = Random.Range(0, dots.Length);
+                    int dotToUse = Random.Range(0, maxCandy);
                     GameObject piece = Instantiate(dots[dotToUse], tempPosition, Quaternion.identity);
                     allDots[i, j] = piece;
                     piece.transform.parent = this.transform;

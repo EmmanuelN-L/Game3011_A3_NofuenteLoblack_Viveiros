@@ -41,6 +41,10 @@ public class UIScript : MonoBehaviour
         {
             loseCondition();
         }
+        
+    }
+    public void updateScore()
+    {
         ScoreText.text = "Score: "+ board.score;
     }
     public void winCondition()
@@ -70,7 +74,7 @@ public class UIScript : MonoBehaviour
     {
         Debug.Log("Easy difficulty selected");
         DifficultyPanel.SetActive(false);
-        board.scoreToReach = 50000;
+        board.scoreToReach = 25000;
         ScoreToReachText.text = "Score to reach: " + board.scoreToReach;
         board.maxCandy = 3;
         board.Setup();
@@ -80,7 +84,7 @@ public class UIScript : MonoBehaviour
     {
         Debug.Log("Medium difficulty selected");
         DifficultyPanel.SetActive(false);
-        board.scoreToReach = 25000;
+        board.scoreToReach = 15000;
         ScoreToReachText.text = "Score to reach: " + board.scoreToReach;
         board.maxCandy = 4;
         board.Setup();
@@ -90,7 +94,7 @@ public class UIScript : MonoBehaviour
     {
         Debug.Log("Hard difficulty selected");
         DifficultyPanel.SetActive(false);
-        board.scoreToReach = 10000;
+        board.scoreToReach = 7500;
         ScoreToReachText.text = "Score to reach: " + board.scoreToReach;
         board.maxCandy = 5;
         board.Setup();

@@ -42,8 +42,10 @@ public class Candy : MonoBehaviour
     public void MakeCandyBomb()
     {
         isCandyBomb = true;
+        gameObject.tag = null;
         GameObject Candy = Instantiate(CandyBomb, transform.position, Quaternion.identity);
-        Candy.transform.parent = this.transform;       
+        Candy.transform.parent = this.transform;
+        
     }
 
 

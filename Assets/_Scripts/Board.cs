@@ -153,6 +153,7 @@ public class Board : MonoBehaviour
             }
             findMatches.currentMatches.Remove(allCandy[column, row]);
             score += 100;
+            UI.updateScore();
             if(soundManager !=null)
             {
                 soundManager.PlaySound();

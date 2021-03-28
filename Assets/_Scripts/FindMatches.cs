@@ -18,7 +18,6 @@ public class FindMatches : MonoBehaviour
         StartCoroutine(findAllMatchesCo());
     }
 
-
     private IEnumerator findAllMatchesCo()
     {
         yield return new WaitForSeconds(0.2f);
@@ -26,32 +25,32 @@ public class FindMatches : MonoBehaviour
         {
             for (int j = 0; j < board.height; j++)
             {
-                GameObject currentDot = board.allDots[i, j];
-                if(currentDot != null)
+                GameObject currentCandy = board.allCandy[i, j];
+                if(currentCandy != null)
                 {
                     if(i > 0 && i < board.width - 1)
                     {
-                        GameObject leftDot = board.allDots[i - 1, j];
-                        GameObject rightDot = board.allDots[i + 1, j];
-                        if(leftDot !=null && rightDot != null)
+                        GameObject leftCandy = board.allCandy[i - 1, j];
+                        GameObject rightCandy = board.allCandy[i + 1, j];
+                        if(leftCandy !=null && rightCandy != null)
                         {
-                            if (leftDot.tag == currentDot.tag && rightDot.tag == currentDot.tag)
+                            if (leftCandy.tag == currentCandy.tag && rightCandy.tag == currentCandy.tag)
                             {
-                                if(!currentMatches.Contains(leftDot))
+                                if(!currentMatches.Contains(leftCandy))
                                 {
-                                    currentMatches.Add(leftDot);
+                                    currentMatches.Add(leftCandy);
                                 }
-                                leftDot.GetComponent<Candy>().isMatched = true;
-                                if (!currentMatches.Contains(rightDot))
+                                leftCandy.GetComponent<Candy>().isMatched = true;
+                                if (!currentMatches.Contains(rightCandy))
                                 {
-                                    currentMatches.Add(rightDot);
+                                    currentMatches.Add(rightCandy);
                                 }
-                                rightDot.GetComponent<Candy>().isMatched = true;
-                                if (!currentMatches.Contains(currentDot))
+                                rightCandy.GetComponent<Candy>().isMatched = true;
+                                if (!currentMatches.Contains(currentCandy))
                                 {
-                                    currentMatches.Add(currentDot);
+                                    currentMatches.Add(currentCandy);
                                 }
-                                currentDot.GetComponent<Candy>().isMatched = true;
+                                currentCandy.GetComponent<Candy>().isMatched = true;
 
                             }
                         }
@@ -59,30 +58,50 @@ public class FindMatches : MonoBehaviour
 
                     if (j > 0 && j < board.height - 1)
                     {
-                        GameObject upDot = board.allDots[i , j + 1];
-                        GameObject downDot = board.allDots[i , j - 1];
-                        if (upDot != null && downDot != null)
+                        GameObject upCandy = board.allCandy[i , j + 1];
+                        GameObject downCandy = board.allCandy[i , j - 1];
+                        if (upCandy != null && downCandy != null)
                         {
-                            if (upDot.tag == currentDot.tag && downDot.tag == currentDot.tag)
+                            if (upCandy.tag == currentCandy.tag && downCandy.tag == currentCandy.tag)
                             {
-                                if (!currentMatches.Contains(upDot))
+                                if (!currentMatches.Contains(upCandy))
                                 {
-                                    currentMatches.Add(upDot);
+                                    currentMatches.Add(upCandy);
                                 }
-                                upDot.GetComponent<Candy>().isMatched = true;
-                                if (!currentMatches.Contains(downDot))
+                                upCandy.GetComponent<Candy>().isMatched = true;
+                                if (!currentMatches.Contains(downCandy))
                                 {
-                                    currentMatches.Add(downDot);
+                                    currentMatches.Add(downCandy);
                                 }
-                                downDot.GetComponent<Candy>().isMatched = true;
-                                if (!currentMatches.Contains(currentDot))
+                                downCandy.GetComponent<Candy>().isMatched = true;
+                                if (!currentMatches.Contains(currentCandy))
                                 {
-                                    currentMatches.Add(currentDot);
+                                    currentMatches.Add(currentCandy);
                                 }
-                                currentDot.GetComponent<Candy>().isMatched = true;
+                                currentCandy.GetComponent<Candy>().isMatched = true;
 
                             }
                         }
+                    }
+                }
+            }
+        }
+    }
+
+    public void MatchPiecesOfColor(string color)
+    {
+        for (int i = 0; i < board.width; i++)
+        {
+            for (int j = 0; j < board.height; j++)
+            {
+                //CHecking if the piece exists
+                if (board.allCandy[i, j] != null)
+                {
+                    //Check the tag of that candy
+                    if (board.allCandy[i, j].tag == color)
+                    {
+                        //Set that candy to be matched
+                        board.allCandy[i, j].GetComponent<Candy>().isMatched = true;
                     }
                 }
             }

@@ -18,22 +18,25 @@ public class Board : MonoBehaviour
     public int height;
     public int offset;
     public GameObject tilePrefab;
-    public GameObject[] dots;
+    public GameObject[] candies;
     private BackgroundTile [,] allTiles;
-    public GameObject[,] allDots;
+    public GameObject[,] allCandy;
+    public Candy currentCandy;
     private FindMatches findMatches;
     private UIScript UI;
+    private SoundManager soundManager;
 
     
 
     // Start is called before the first frame update
     void Start()
     {
+        soundManager = FindObjectOfType<SoundManager>();
         findMatches = FindObjectOfType<FindMatches>();
         UI = FindObjectOfType<UIScript>();
         //Creating the width and height of board
         allTiles = new BackgroundTile[width, height];
-        allDots = new GameObject[width, height];
+        allCandy = new GameObject[width, height];
         //Setup();
         
     }
@@ -49,24 +52,24 @@ public class Board : MonoBehaviour
                 GameObject backgrounTile = Instantiate(tilePrefab, tempPosition, Quaternion.identity) as GameObject;
                 backgrounTile.transform.parent = this.transform;
                 backgrounTile.name = "( " + i +", " + j + " )";
-                int dotToUse = Random.Range(0, maxCandy);
+                int candyToUse = Random.Range(0, maxCandy);
                 int maxIterations = 0;
 
-                while(matchesAt(i, j, dots[dotToUse]) && maxIterations < 100)
+                while(matchesAt(i, j, candies[candyToUse]) && maxIterations < 100)
                 {
-                    dotToUse = Random.Range(0, maxCandy);
+                    candyToUse = Random.Range(0, maxCandy);
                     maxIterations++;
                 }
                 maxIterations = 0;
 
-                GameObject dot = Instantiate(dots[dotToUse], tempPosition, Quaternion.identity);
-                dot.GetComponent<Candy>().row = j;
-                dot.GetComponent<Candy>().column = i;
+                GameObject candy = Instantiate(candies[candyToUse], tempPosition, Quaternion.identity);
+                candy.GetComponent<Candy>().row = j;
+                candy.GetComponent<Candy>().column = i;
 
-                dot.transform.parent = this.transform;
-                dot.name = "( " + i + ", " + j + " )";
+                candy.transform.parent = this.transform;
+                candy.name = "( " + i + ", " + j + " )";
 
-                allDots[i, j] = dot;
+                allCandy[i, j] = candy;
 
             }
         }
@@ -76,11 +79,11 @@ public class Board : MonoBehaviour
     {
         if(column > 1 && row > 1)
         {
-            if (allDots[column - 1, row].tag == piece.tag && allDots[column - 2, row].tag == piece.tag)
+            if (allCandy[column - 1, row].tag == piece.tag && allCandy[column - 2, row].tag == piece.tag)
             {
                 return true;
             }
-            if (allDots[column , row - 1].tag == piece.tag && allDots[column , row - 2].tag == piece.tag)
+            if (allCandy[column , row - 1].tag == piece.tag && allCandy[column , row - 2].tag == piece.tag)
             {
                 return true;
             }
@@ -89,14 +92,14 @@ public class Board : MonoBehaviour
         {
             if(row > 1)
             {
-                if(allDots[column, row -1].tag == piece.tag && allDots[column, row - 2].tag == piece.tag)
+                if(allCandy[column, row -1].tag == piece.tag && allCandy[column, row - 2].tag == piece.tag)
                 {
                     return true;
                 }
             }
             if (column > 1)
             {
-                if (allDots[column - 1, row ].tag == piece.tag && allDots[column- 2, row].tag == piece.tag)
+                if (allCandy[column - 1, row ].tag == piece.tag && allCandy[column- 2, row].tag == piece.tag)
                 {
                     return true;
                 }
@@ -106,18 +109,60 @@ public class Board : MonoBehaviour
         return false;
     }
 
+    private void CheckTomakeBombs()
+    {
+        if(findMatches.currentMatches.Count >= 5)
+        {
+            Debug.Log("Make a color bomb");
+            if(currentCandy != null)
+            {
+                if(currentCandy.isMatched)
+                {
+                    if(!currentCandy.isCandyBomb)
+                    {
+                        currentCandy.isMatched = false;
+                        currentCandy.MakeCandyBomb();
+                    }
+                }
+                else
+                {
+                    if(currentCandy.otherCandy != null)
+                    {
+                        Candy otherCandy = currentCandy.otherCandy.GetComponent<Candy>();
+                        if(otherCandy.isMatched)
+                        {
+                            if(!otherCandy.isCandyBomb)
+                            {
+                                otherCandy.isMatched = false;
+                                otherCandy.MakeCandyBomb();
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     private void destroyMatchesAt(int column, int row)
     {
-        if(allDots[column, row].GetComponent<Candy>().isMatched)
+        if(allCandy[column, row].GetComponent<Candy>().isMatched)
         {
-            findMatches.currentMatches.Remove(allDots[column, row]);
+            if(findMatches.currentMatches.Count >=5)
+            {
+                CheckTomakeBombs();
+            }
+            findMatches.currentMatches.Remove(allCandy[column, row]);
             score += 100;
+            if(soundManager !=null)
+            {
+                soundManager.PlaySound();
+            }
             if (score >= scoreToReach)
             {
                 UI.winCondition();
             }
-            Destroy(allDots[column, row]);
-            allDots[column, row] = null;
+            Destroy(allCandy[column, row]);
+            allCandy[column, row] = null;
         }
     }
     //Destroys the candies that were a match
@@ -127,7 +172,7 @@ public class Board : MonoBehaviour
         {
             for (int j = 0; j< height; j++)
             {
-                if(allDots[i, j] !=null)
+                if(allCandy[i, j] !=null)
                 {
                     destroyMatchesAt(i, j);
                 }
@@ -143,14 +188,14 @@ public class Board : MonoBehaviour
         {
             for (int j = 0; j < height; j++)
             {
-                if (allDots[i, j] == null)
+                if (allCandy[i, j] == null)
                 {
                     nullCount++;
                 }
                 else if(nullCount > 0)
                 {
-                    allDots[i, j].GetComponent<Candy>().row -= nullCount;
-                    allDots[i, j] = null;
+                    allCandy[i, j].GetComponent<Candy>().row -= nullCount;
+                    allCandy[i, j] = null;
                 }
             }
             nullCount = 0;
@@ -166,12 +211,12 @@ public class Board : MonoBehaviour
         {
             for (int j = 0; j < height; j++)
             {
-                if (allDots[i, j] == null)
+                if (allCandy[i, j] == null)
                 {
                     Vector2 tempPosition = new Vector2(i, j + offset);
-                    int dotToUse = Random.Range(0, maxCandy);
-                    GameObject piece = Instantiate(dots[dotToUse], tempPosition, Quaternion.identity);
-                    allDots[i, j] = piece;
+                    int candyToUse = Random.Range(0, maxCandy);
+                    GameObject piece = Instantiate(candies[candyToUse], tempPosition, Quaternion.identity);
+                    allCandy[i, j] = piece;
                     piece.transform.parent = this.transform;
                     piece.name = "( " + i + ", " + j + " )";
                     piece.GetComponent<Candy>().row = j;
@@ -187,9 +232,9 @@ public class Board : MonoBehaviour
         {
             for (int j = 0; j < height; j++)
             {
-                if (allDots[i, j] != null)
+                if (allCandy[i, j] != null)
                 {
-                    if(allDots[i,j].GetComponent<Candy>().isMatched)
+                    if(allCandy[i,j].GetComponent<Candy>().isMatched)
                     {
                         return true;
                     }

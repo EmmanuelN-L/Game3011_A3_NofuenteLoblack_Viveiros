@@ -12,30 +12,40 @@ public class Candy : MonoBehaviour
     public int targetX;
     public int targetY;
     public bool isMatched = false;
+    public GameObject otherCandy;
 
+    public AudioSource matchSfx;
+    
     private FindMatches findMatches;
-    private Board board;
-    private GameObject otherCandy;
+    private Board board;   
     private Vector2 firstClickPosition;
     private Vector2 finalClickPosition;
     private Vector2 tempPosition;
 
+    [Header("Swiping Variables")]
     public float swipeAngle = 0;
     public float swipeResist = 1f;
 
+    [Header("PowerUp Variables")]
+    public bool isCandyBomb;
+    public GameObject CandyBomb;
+
     // Start is called before the first frame update
-    void Start()
+    public void Start()
     {
         board = FindObjectOfType<Board>();
         findMatches = FindObjectOfType<FindMatches>();
-        //targetX = (int)transform.position.x;
-        //targetY = (int)transform.position.y;
-        //row = targetY;
-        //column = targetX;
-        //previousRow = row;
-        //previousColumn = column;
 
     }
+
+    //Testing
+    public void MakeCandyBomb()
+    {
+        isCandyBomb = true;
+        GameObject Candy = Instantiate(CandyBomb, transform.position, Quaternion.identity);
+        Candy.transform.parent = this.transform;       
+    }
+
 
     // Update is called once per frame
     void Update()
@@ -57,9 +67,9 @@ public class Candy : MonoBehaviour
             //Move Toward the target
             tempPosition = new Vector2(targetX, transform.position.y);
             transform.position = Vector2.Lerp(transform.position, tempPosition, 0.1f);
-            if(board.allDots[column, row] != this.gameObject)
+            if(board.allCandy[column, row] != this.gameObject)
             {
-                board.allDots[column, row] = this.gameObject;
+                board.allCandy[column, row] = this.gameObject;
             }
             findMatches.findAllMatches();
         }
@@ -76,9 +86,9 @@ public class Candy : MonoBehaviour
             //Move Toward the target
             tempPosition = new Vector2(transform.position.x, targetY);
             transform.position = Vector2.Lerp(transform.position, tempPosition, 0.1f);
-            if (board.allDots[column, row] != this.gameObject)
+            if (board.allCandy[column, row] != this.gameObject)
             {
-                board.allDots[column, row] = this.gameObject;
+                board.allCandy[column, row] = this.gameObject;
             }
             findMatches.findAllMatches();
         }
@@ -92,6 +102,19 @@ public class Candy : MonoBehaviour
 
     public IEnumerator CheckMoveCo()
     {
+        if(isCandyBomb)
+        {
+            //This piece is a candy bomb, and the other piece is the candy to destroy
+            findMatches.MatchPiecesOfColor(otherCandy.tag);
+            isMatched = true;
+        }
+        else if(otherCandy.GetComponent<Candy>().isCandyBomb)
+        {
+            //The other piece is a candy bomb, and this piece has the candy to destroy
+            findMatches.MatchPiecesOfColor(this.gameObject.tag);
+            otherCandy.GetComponent<Candy>().isMatched = true;
+        }
+
         yield return new WaitForSeconds(1.0f);
         if(otherCandy != null)
         {
@@ -102,14 +125,16 @@ public class Candy : MonoBehaviour
                 row = previousRow;
                 column = previousColumn;     
                 yield return new WaitForSeconds(0.5f);
+                board.currentCandy = null;
                 board.currentState = GameState.move;
             }  
             else
             {
+            
             board.destroyMatches();
 
             }
-            otherCandy = null;
+            //otherCandy = null;
         }
 
 
@@ -146,11 +171,13 @@ public class Candy : MonoBehaviour
             if (otherCandy != null)
             {
                 board.currentState = GameState.wait;
+                board.currentCandy = this;
             }
         }
         else
         {
             board.currentState = GameState.move;
+            
         }
 
     }
@@ -160,7 +187,7 @@ public class Candy : MonoBehaviour
         if(swipeAngle > -45 && swipeAngle <= 45 && column < board.width - 1)
         {
             //Right Swipe
-            otherCandy = board.allDots[column + 1, row];
+            otherCandy = board.allCandy[column + 1, row];
             previousRow = row;
             previousColumn = column;
             otherCandy.GetComponent<Candy>().column -= 1;
@@ -169,7 +196,7 @@ public class Candy : MonoBehaviour
         else if (swipeAngle > 45 && swipeAngle <= 135 && row < board.height - 1)
         {
             //Up Swipe
-            otherCandy = board.allDots[column , row + 1];
+            otherCandy = board.allCandy[column , row + 1];
             previousRow = row;
             previousColumn = column;
             otherCandy.GetComponent<Candy>().row -= 1;
@@ -178,7 +205,7 @@ public class Candy : MonoBehaviour
         else if ((swipeAngle > 135 || swipeAngle <= -135) && column > 0)
         {
             //Left Swipe
-            otherCandy = board.allDots[column -1, row];
+            otherCandy = board.allCandy[column -1, row];
             previousRow = row;
             previousColumn = column;
             otherCandy.GetComponent<Candy>().column += 1;
@@ -187,7 +214,7 @@ public class Candy : MonoBehaviour
         else if (swipeAngle < -45 && swipeAngle >= -135 && row > 0)
         {
             //Down Swipe
-            otherCandy = board.allDots[column, row - 1];
+            otherCandy = board.allCandy[column, row - 1];
             previousRow = row;
             previousColumn = column;
             otherCandy.GetComponent<Candy>().row += 1;
@@ -195,32 +222,4 @@ public class Candy : MonoBehaviour
         }
         StartCoroutine(CheckMoveCo());
     }
-
-    //void findMatches()
-    //{
-    //    if(column > 0 && column < board.width - 1)
-    //    {
-    //        GameObject leftDot1 = board.allDots[column - 1, row];
-    //        GameObject rightDot1 = board.allDots[column + 1, row];
-    //        if (leftDot1.tag == this.gameObject.tag && rightDot1.tag == this.gameObject.tag)
-    //        {
-    //            leftDot1.GetComponent<Candy>().isMatched = true;
-    //            rightDot1.GetComponent<Candy>().isMatched = true;
-    //            isMatched = true;
-    //        }
-    //    }
-
-    //    if (row > 0 && row < board.height - 1)
-    //    {
-    //        GameObject upDot1 = board.allDots[column, row + 1];
-    //        GameObject downDot1 = board.allDots[column, row - 1];
-    //        if (upDot1.tag == this.gameObject.tag && downDot1.tag == this.gameObject.tag)
-    //        {
-    //            upDot1.GetComponent<Candy>().isMatched = true;
-    //            downDot1.GetComponent<Candy>().isMatched = true;
-    //            isMatched = true;
-    //        }
-    //    }
-    //}
-
 }

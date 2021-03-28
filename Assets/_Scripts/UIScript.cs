@@ -67,14 +67,20 @@ public class UIScript : MonoBehaviour
 
     public void RestartLevel()
     {
+        Time.timeScale = 1;
         SceneManager.LoadScene("Main");
+    }
+
+    public void ExitGame()
+    {
+        Application.Quit();
     }
 
     public void EasySelected()
     {
         Debug.Log("Easy difficulty selected");
         DifficultyPanel.SetActive(false);
-        board.scoreToReach = 25000;
+        board.scoreToReach = 40000;
         ScoreToReachText.text = "Score to reach: " + board.scoreToReach;
         board.maxCandy = 3;
         board.Setup();
@@ -84,7 +90,7 @@ public class UIScript : MonoBehaviour
     {
         Debug.Log("Medium difficulty selected");
         DifficultyPanel.SetActive(false);
-        board.scoreToReach = 15000;
+        board.scoreToReach = 25000;
         ScoreToReachText.text = "Score to reach: " + board.scoreToReach;
         board.maxCandy = 4;
         board.Setup();
@@ -94,7 +100,7 @@ public class UIScript : MonoBehaviour
     {
         Debug.Log("Hard difficulty selected");
         DifficultyPanel.SetActive(false);
-        board.scoreToReach = 7500;
+        board.scoreToReach = 20000;
         ScoreToReachText.text = "Score to reach: " + board.scoreToReach;
         board.maxCandy = 5;
         board.Setup();
